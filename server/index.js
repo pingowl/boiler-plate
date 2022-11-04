@@ -2,9 +2,9 @@ const express = require('express')
 const app = express()
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const config = require('./server/config/key');
+const config = require('./config/key');
 const { auth } = require('./middleware/auth');
-const { User } = require("./server/models/User");
+const { User } = require("./models/User");
 
 //application/x-www-form-urlencoded 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -14,9 +14,7 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 const mongoose = require('mongoose')
-mongoose.connect(config.mongoURI, {
-  useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: false
-}).then(() => console.log('MongoDB Connected...'))
+mongoose.connect(config.mongoURI).then(() => console.log('MongoDB Connected...'))
   .catch(err => console.log(err))
 
 
@@ -65,7 +63,7 @@ app.post('/api/users/login', (req, res) => {
       user.generateToken((err, user) => {
         if (err) return res.status(400).send(err);
 
-        // 토큰을 저장한다.  어디에 ?  쿠키 , 로컳스토리지 
+        // 토큰을 저장한다.  어디에 ?  쿠키 , 로컬스토리지 
         res.cookie("x_auth", user.token)
           .status(200)
           .json({ loginSuccess: true, userId: user._id })
